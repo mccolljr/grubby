@@ -12,29 +12,49 @@ import (
 )
 
 var verboseFlag = flag.Bool("verbose", false, "enables verbose mode")
+var versionFlag = flag.Bool("version", false, "print version and exit")
 
 func init() {
-	flag.BoolVar(verboseFlag, "v", false, "enables verbose mode")
+	flag.BoolVar(versionFlag, "v", false, "print version and exit")
+	flag.BoolVar(verboseFlag, "V", false, "enables verbose mode")
 }
 
 func main() {
 	flag.Parse()
 
-	// for now, assumes this is only being invoked with a filename to interpret
-	file, err := os.Open(flag.Args()[0])
-	if err != nil {
-		panic(err)
+	// exit early if we've been asked for the version
+	if *versionFlag {
+		fmt.Println("grubby")
+		return
+	}
+
+	var err error
+	var file *os.File
+	var fname string
+
+	if len(flag.Args()) == 0 {
+		file = os.Stdin
+		fname = "STDIN"
+	} else {
+		fname = flag.Args()[0]
+		file, err = os.Open(fname)
+		if err != nil {
+			fmt.Printf("can't open file %s, aborting\n", fname)
+			os.Exit(1)
+		}
 	}
 
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		panic(err)
+		fmt.Printf("can't read file %s, aborting\n", fname)
+		os.Exit(1)
 	}
 
+	// TODO is this a good idea? Should we use standard ruby environment variables?
 	home := os.Getenv("HOME")
 	grubbyHome := filepath.Join(home, ".grubby")
 
-	rubyVM := vm.NewVM(grubbyHome, flag.Args()[0])
+	rubyVM := vm.NewVM(grubbyHome, fname)
 	defer rubyVM.Exit()
 
 	_, err = rubyVM.Run(string(bytes))

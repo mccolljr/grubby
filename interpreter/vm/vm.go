@@ -90,6 +90,7 @@ func NewVM(rubyHome, name string) VM {
 	vm.CurrentClasses["Object"].SetConstant("RUBY_NAME", NewString("grubby", vm))
 	vm.CurrentClasses["Object"].SetConstant("ENV", NewENVConstant(vm))
 
+	// TODO HACK FIXME FIXME FIXME TODO HACK
 	// this is a temporary hack to gain progress on running rubyspec
 	// as an alternative, we could implement String#=~
 	vm.CurrentClasses["Object"].SetConstant("RUBY_EXE", NewString("bin/ruby", vm))
@@ -135,6 +136,7 @@ func (vm *vm) registerBuiltinClassesAndModules() {
 			path := pathStr.(*StringValue)
 			fullPath := filepath.Join(path.RawString(), fileName+".rb")
 			file, err := os.Open(fullPath)
+
 			if err != nil {
 				continue
 			}
