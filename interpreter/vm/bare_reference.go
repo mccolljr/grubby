@@ -12,7 +12,6 @@ func interpretBareReferenceInContext(
 	ref ast.BareReference,
 	context Value,
 ) (Value, error) {
-
 	var name string = ref.Name
 	var returnErr error
 

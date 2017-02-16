@@ -41,7 +41,12 @@ func NewClassClass(provider Provider) Class {
 			return nil, err
 		}
 
-		method := instance.Method("initialize")
+		// TODO REVIEW -> it appears as though we were calling the instance's initialize method when initializing the Class class
+		// so, we're now looking at the ClassValue's initialize method, instead
+		// REPLACED
+		// method := instance.Method("initialize")
+		// WITH
+		method := c.Method("initialize")
 		if method != nil {
 			_, err = method.Execute(instance, block, args...)
 			if err != nil {
@@ -216,6 +221,7 @@ func (c *UserDefinedClass) New(provider Provider, args ...Value) (Value, error) 
 	}
 
 	method := instance.Method("initialize")
+
 	if method != nil {
 		_, err := method.Execute(instance, nil, args...)
 		if err != nil {
